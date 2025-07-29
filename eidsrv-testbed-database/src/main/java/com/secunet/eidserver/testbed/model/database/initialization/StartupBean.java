@@ -56,11 +56,48 @@ class StartupBean
 		{
 			createTables();
 		}
+		else
+		{
+			// Check and update schema if needed
+			updateSchema();
+		}
 		if (!hasDefaults())
 		{
 			loadDefaults();
 		}
 		logger.info("Initialization done.");
+	}
+	
+	/**
+	 * Updates the database schema to ensure all required columns exist
+	 */
+	private void updateSchema()
+	{
+		try (Connection conn = dsc.getConnection())
+		{
+			// Check if SINGLE_CLIENT_EXPLANATION column exists in TEST_CASE table
+			boolean columnExists = false;
+			try (ResultSet columns = conn.getMetaData().getColumns(null, null, "TEST_CASE", "SINGLE_CLIENT_EXPLANATION"))
+			{
+				columnExists = columns.next();
+			}
+			
+			// If column doesn't exist, execute the alter script
+			if (!columnExists)
+			{
+				logger.info("Adding missing SINGLE_CLIENT_EXPLANATION column to TEST_CASE table...");
+				try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("sql/ddl/alter_test_case.sql");
+						InputStreamReader reader = new InputStreamReader(input, StandardCharsets.UTF_8))
+				{
+					RunScript.execute(conn, reader);
+					logger.info("SINGLE_CLIENT_EXPLANATION column added successfully.");
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Error updating database schema: " + e.getMessage(), e);
+		}
 	}
 
 	private boolean hasDatabaseTables()

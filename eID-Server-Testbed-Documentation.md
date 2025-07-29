@@ -88,13 +88,6 @@ There are two ways to install the eID-Server Testbed:
    /opt/payara41/bin/asadmin deploy eidsrv-testbed-application-1.0-beta-4.ear
    ```
 
-7. Generate self-signed certificates:
-   ```bash
-   mkdir -p /opt/payara41/glassfish/domains/domain1/config/certificates
-   openssl req -x509 -newkey rsa:4096 -keyout /opt/payara41/glassfish/domains/domain1/config/certificates/payara-key.pem -out /opt/payara41/glassfish/domains/domain1/config/certificates/payara-cert.pem -days 365 -nodes -subj "/C=DE/ST=Berlin/L=Berlin/O=eID-Server-Testbed/OU=Testing/CN=localhost"
-   cat /opt/payara41/glassfish/domains/domain1/config/certificates/payara-cert.pem /opt/payara41/glassfish/domains/domain1/config/certificates/payara-key.pem > /opt/payara41/glassfish/domains/domain1/config/certificates/payara.pem
-   ```
-
 ## Running the Server
 
 ### Starting the Server

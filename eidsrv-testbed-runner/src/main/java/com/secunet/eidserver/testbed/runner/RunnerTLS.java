@@ -174,10 +174,10 @@ public class RunnerTLS
 				switch (stepToken.getName())
 				{
 					case "Version":
-						tlsTestParameters.setVersion(BouncyCastleTlsHelper.convertProtocolVersionStringToObject(stepToken.getValue()));
+						tlsTestParameters.setVersion(convertProtocolVersion(BouncyCastleTlsHelper.convertProtocolVersionStringToObject(stepToken.getValue())));
 						break;
 					case "SelectedVersion":
-						tlsTestParameters.setSelectedVersion(BouncyCastleTlsHelper.convertProtocolVersionStringToObject(stepToken.getValue()));
+						tlsTestParameters.setSelectedVersion(convertProtocolVersion(BouncyCastleTlsHelper.convertProtocolVersionStringToObject(stepToken.getValue())));
 						break;
 					case "CipherSuites":
 						tlsTestParameters.setCipherSuites(getConvertedListAsArray(stepToken.getValue(), BouncyCastleTlsHelper::convertCipherSuiteStringToInt));
@@ -282,8 +282,80 @@ public class RunnerTLS
 		return list;
 	}
 
+	/**
+	 * Converts a com.secunet.bouncycastle.crypto.tls.ProtocolVersion to org.bouncycastle.crypto.tls.ProtocolVersion
+	 * 
+	 * @param secunetVersion the com.secunet.bouncycastle version
+	 * @return the org.bouncycastle version
+	 */
+	private org.bouncycastle.crypto.tls.ProtocolVersion convertProtocolVersion(Object secunetVersion)
+	{
+		if (secunetVersion == null)
+		{
+			return null;
+		}
+		
+		// Use reflection to get the version values
+		try
+		{
+			Class<?> secunetClass = secunetVersion.getClass();
+			java.lang.reflect.Field majorField = secunetClass.getDeclaredField("major");
+			java.lang.reflect.Field minorField = secunetClass.getDeclaredField("minor");
+			
+			majorField.setAccessible(true);
+			minorField.setAccessible(true);
+			
+			int major = majorField.getInt(secunetVersion);
+			int minor = minorField.getInt(secunetVersion);
+			
+			// Create the corresponding org.bouncycastle version
+			return org.bouncycastle.crypto.tls.ProtocolVersion.get(major, minor);
+		}
+		catch (Exception e)
+		{
+			// If conversion fails, return TLSv12 as a fallback
+			return org.bouncycastle.crypto.tls.ProtocolVersion.TLSv12;
+		}
+	}
+	
+	/**
+	 * Converts a com.secunet.bouncycastle.crypto.tls.SignatureAndHashAlgorithm to org.bouncycastle.crypto.tls.SignatureAndHashAlgorithm
+	 * 
+	 * @param secunetAlgorithm the com.secunet.bouncycastle algorithm
+	 * @return the org.bouncycastle algorithm
+	 */
+	private org.bouncycastle.crypto.tls.SignatureAndHashAlgorithm convertSignatureAndHashAlgorithm(Object secunetAlgorithm)
+	{
+		if (secunetAlgorithm == null)
+		{
+			return null;
+		}
+		
+		// Use reflection to get the hash and signature values
+		try
+		{
+			Class<?> secunetClass = secunetAlgorithm.getClass();
+			java.lang.reflect.Field hashField = secunetClass.getDeclaredField("hash");
+			java.lang.reflect.Field signatureField = secunetClass.getDeclaredField("signature");
+			
+			hashField.setAccessible(true);
+			signatureField.setAccessible(true);
+			
+			short hash = hashField.getShort(secunetAlgorithm);
+			short signature = signatureField.getShort(secunetAlgorithm);
+			
+			// Create the corresponding org.bouncycastle algorithm
+			return new org.bouncycastle.crypto.tls.SignatureAndHashAlgorithm(hash, signature);
+		}
+		catch (Exception e)
+		{
+			// If conversion fails, return null
+			return null;
+		}
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Vector getConvertedListAsVector(String prop, Function<String, SignatureAndHashAlgorithm> converter)
+	private Vector getConvertedListAsVector(String prop, Function<String, Object> converter)
 	{
 		Vector vec = new Vector();
 		if (prop != null && !prop.trim().isEmpty())
@@ -291,7 +363,13 @@ public class RunnerTLS
 			String[] parts = prop.split(",");
 			for (int i = 0; i < parts.length; i++)
 			{
-				vec.add(converter.apply(parts[i].trim()));
+				// Convert from com.secunet.bouncycastle to org.bouncycastle
+				Object secunetAlgorithm = converter.apply(parts[i].trim());
+				org.bouncycastle.crypto.tls.SignatureAndHashAlgorithm bcAlgorithm = convertSignatureAndHashAlgorithm(secunetAlgorithm);
+				if (bcAlgorithm != null)
+				{
+					vec.add(bcAlgorithm);
+				}
 			}
 		}
 		return vec;

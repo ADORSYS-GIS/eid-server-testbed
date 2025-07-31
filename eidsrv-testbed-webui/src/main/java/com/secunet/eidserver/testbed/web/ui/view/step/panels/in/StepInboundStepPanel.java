@@ -4,8 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import com.secunet.eidserver.testbed.common.interfaces.entities.TestCaseStep;
 import com.secunet.eidserver.testbed.common.types.testcase.Step;
@@ -22,7 +21,7 @@ public class StepInboundStepPanel extends VerticalLayout implements PropertyChan
 	/** generated */
 	private static final long serialVersionUID = 8929740463837737182L;
 
-	private static final Logger logger = LogManager.getRootLogger();
+	private static final Logger logger = Logger.getRootLogger();
 
 	protected TeststepEditModel model;
 	protected TestCaseStep editing;

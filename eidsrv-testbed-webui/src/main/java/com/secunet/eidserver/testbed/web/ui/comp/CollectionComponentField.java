@@ -3,8 +3,7 @@ package com.secunet.eidserver.testbed.web.ui.comp;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import com.secunet.eidserver.testbed.common.interfaces.dao.GenericDAO;
 import com.secunet.eidserver.testbed.web.i18n.I18NHandler;
@@ -34,7 +33,7 @@ import com.vaadin.ui.themes.ValoTheme;
 //public class CollectionComponentField<C extends Collection<O>, O> extends CustomField<C>
 public class CollectionComponentField<C extends Collection<W>, W> extends CustomField<C>
 {
-	private static final Logger logger = LogManager.getRootLogger();
+	private static final Logger logger = Logger.getRootLogger();
 
 	public static final String CAPTION_PROPERTY = "caption";
 	public static final String VALUE_PROPERTY = "value";

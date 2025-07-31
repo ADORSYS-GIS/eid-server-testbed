@@ -50,12 +50,13 @@ $asadmin start-domain
 
 # Check if application is already deployed
 if $asadmin list-applications | grep -q "$TESTBED_APP"; then
-  echo "-- Application is already deployed --"
-else
-  # Deploy the application
-  echo "-- Deploying application --"
-  $asadmin deploy $TESTBED_APP
+  echo "-- Application is already deployed, undeploying first --"
+  $asadmin undeploy $TESTBED_APP
 fi
+
+# Deploy the application
+echo "-- Deploying application --"
+$asadmin deploy $TESTBED_APP
 
 # Check if the application is accessible
 echo "-- Checking if the application is accessible --"

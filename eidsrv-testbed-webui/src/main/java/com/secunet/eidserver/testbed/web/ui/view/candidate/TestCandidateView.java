@@ -21,8 +21,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 import org.vaadin.viritin.ListContainer;
 
 import com.secunet.eidserver.testbed.common.constants.Bitlengths;
@@ -105,7 +104,7 @@ import com.vaadin.ui.Upload;
 @CDIView("candidate")
 public class TestCandidateView extends AbstractTestbedView implements View, PropertyChangeListener
 {
-	private static final Logger logger = LogManager.getRootLogger();
+	private static final Logger logger = Logger.getRootLogger();
 
 	@EJB
 	private TestCandidateDAO testCandidateDAO;
